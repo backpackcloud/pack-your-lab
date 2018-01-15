@@ -1,0 +1,16 @@
+---
+- hosts: osp
+  remote_user: root
+  name: Configure OpenStack Key Pair
+  tasks:
+    - name: send key
+      copy:
+        src: "{{ item.value }}"
+        dest: "{{ osp.resource_path }}/{{ item.key }}.key"
+      with_dict: "{{ osp.keypairs }}"
+
+    - name: add key
+      shell: >
+        source ~/keystonerc_admin && \
+        openstack keypair create --public-key "{{ osp.resource_path }}/{{ item.key }}.key" {{ item.key }}
+      with_dict: "{{ osp.keypairs }}"

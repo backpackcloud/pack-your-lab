@@ -1,0 +1,6 @@
+---
+- import_playbook: config/keypair.yml
+- import_playbook: config/network.yml
+- import_playbook: config/flavors.yml
+- import_playbook: config/images.yml
+- import_playbook: config/lab.yml

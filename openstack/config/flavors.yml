@@ -1,0 +1,16 @@
+---
+- hosts: osp
+  remote_user: root
+  name: Configure OpenStack Flavors
+  tasks:
+    - name: create flavor
+      shell: >
+        source ~/keystonerc_admin && \
+        openstack flavor create \
+          --ram {{ item.value.ram }} \
+          --disk {{ item.value.disk }} \
+          --ephemeral {{ item.value.ephemeral }} \
+          --swap {{ item.value.swap }} \
+          --vcpus {{ item.value.vcpus }} \
+          {{ item.key }}
+      with_dict: "{{ osp.flavors }}"

@@ -1,0 +1,49 @@
+---
+- hosts: osp
+  remote_user: root
+  name: Prepare OpenStack Installation
+
+  tasks:
+    - name: create resource folder
+      file:
+        path: "{{ osp.resource_path }}"
+        state: directory
+
+    - name: subscribe host
+      redhat_subscription:
+        state: present
+        username: "{{ subscription.user }}"
+        password: "{{ subscription.password }}"
+        pool_ids: "{{ subscription.pool_ids }}"
+
+    - name: disable all repositories
+      shell: subscription-manager repos --disable=*
+
+    - name: enable repos
+      shell: subscription-manager repos --enable={{ item }}
+      with_items:
+        - rhel-7-server-rpms
+        - rhel-7-server-rh-common-rpms
+        - rhel-7-server-extras-rpms
+        - rhel-7-server-openstack-12-rpms
+        - rhel-7-server-openstack-12-devtools-rpms
+
+    - name: install packages
+      yum:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - python2-setuptools
+        - yum-utils
+        - openstack-utils
+        - openstack-packstack
+
+    - name: disable network manager
+      shell: >
+        systemctl disable NetworkManager ; systemctl stop NetworkManager ; systemctl enable network ; systemctl start network
+
+    - name: disable firewalld
+      systemd:
+        name: firewalld
+        state: stopped
+        enabled: no

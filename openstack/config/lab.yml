@@ -1,0 +1,62 @@
+---
+- hosts: osp
+  remote_user: root
+  name: Configure OpenStack Packed Lab
+  tasks:
+    - name: create project
+      shell: >
+        source ~/keystonerc_admin && \
+        openstack project create --enable lab && \
+        openstack role add --user admin --project lab _member_ && \
+        openstack role add --user admin --project lab admin
+
+    - name: configure lab network
+      shell: >
+        source ~/keystonerc_admin && export OS_PROJECT_NAME=lab && \
+        openstack network create {{ item.key }}_network && \
+        openstack subnet create --dhcp \
+          --allocation-pool start={{ item.value.dhcp.start }},end={{ item.value.dhcp.end }} \
+          --dns-nameserver {{ osp.network.dns }} \
+          --network {{ item.key }}_network \
+          --subnet-range {{ item.value.cidr }} \
+          {{ item.key }}_subnet
+      with_dict: "{{ osp.lab.networks }}"
+
+    - name: create router
+      shell: >
+        source ~/keystonerc_admin && export OS_PROJECT_NAME=lab && \
+        openstack router create --project lab --enable lab_router && \
+        neutron router-gateway-set lab_router public_network
+
+    - name: add lab subnet to router
+      shell: >
+        source ~/keystonerc_admin && export OS_PROJECT_NAME=lab && \
+        openstack router add subnet lab_router "{{ item.key }}"_subnet
+      with_dict: "{{ osp.lab.networks }}"
+
+    - name: get default security group id
+      shell: >
+        source ~/keystonerc_admin && export OS_PROJECT_NAME=lab && \
+        eval $(openstack project show lab -f shell) && openstack security group list | grep $id | grep default | cut -d' ' -f2
+      register: security_group_id
+
+    - name: configure default security group
+      shell: >
+        source ~/keystonerc_admin && export OS_PROJECT_NAME=lab && \
+        openstack security group rule create \
+          --ingress \
+          --protocol icmp \
+          --ethertype IPv4 \
+          {{ security_group_id.stdout }} && \
+        openstack security group rule create \
+          --ingress \
+          --protocol tcp \
+          --ethertype IPv4 \
+          --dst-port 22 \
+          {{ security_group_id.stdout }}
+
+    - name: create floating ip
+      shell: >
+        source ~/keystonerc_admin && export OS_PROJECT_NAME=lab && \
+        openstack floating ip create public_network
+      with_sequence: count={{ osp.lab.floating_ip }}

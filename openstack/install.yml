@@ -1,0 +1,4 @@
+---
+- import_playbook: prepare.yml
+- import_playbook: packstack.yml
+- import_playbook: configure.yml

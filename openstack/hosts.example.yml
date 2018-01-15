@@ -1,0 +1,52 @@
+osp:
+  hosts:
+    my-openstack-host:
+  vars:
+    subscription:
+      user: some-user
+      password: some-password
+      pool_ids:
+        - my-openstack-pool-id
+    network:
+      cidr: 192.168.0.0./24
+      dns: 192.168.0.1
+      dhcp:
+        start: 192.168.0.20
+        end: 192.168.0.100
+    osp:
+      resource_path: /tmp/openstack
+      packstack:
+        CONFIG_DEFAULT_PASSWORD: openstack
+        CONFIG_KEYSTONE_ADMIN_PW: openstack
+        CONFIG_CINDER_VOLUMES_SIZE: 300G
+        CONFIG_HEAT_INSTALL: y
+      keypairs:
+        laptop: ~/.ssh/id_rsa.pub
+      network:
+        nic: eno1
+        cidr: 192.168.0.0/24
+        dns: 192.168.0.1
+        dhcp:
+          start: 192.168.0.20
+          end: 192.168.0.100
+      images:
+        cirros:
+          local_path: /path/to/cirros-0.4.0-x86_64-disk.img
+          disk_format: qcow2
+          min_disk: 1
+          min_ram: 128
+      flavors:
+        m1.nano:
+          ram: 128
+          disk: 1
+          ephemeral: 0
+          swap: 0
+          vcpus: 1
+      lab:
+        floating_ip: 5
+        networks:
+          lab:
+            cidr: 10.0.0.0/24
+            dhcp:
+              start: 10.0.0.10
+              end: 10.0.0.100
