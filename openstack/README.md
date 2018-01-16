@@ -5,13 +5,19 @@ Canyon.
 
 The playbook will:
 
-1. Subscribe the host
-2. Enable the required repositories
-3. Install the required packages
-4. Create and customize the packstack answer file
-5. Invoke the packstack installer
-6. Create a public flat network with a subnet
-7. Create the resources mapped in the hosts file
+- Subscribe the host
+- Enable the required repositories
+- Install the required packages
+- Create and customize the packstack answer file
+- Invoke the packstack installer
+- Create a public flat network with a subnet
+- Create the supplied images
+- Create the supplied flavors
+- Create the supplied keypair
+- Create a `lab` project with the supplied networks, floating IPs
+- Add SSH and ICMP to the default security group
+
+Which means: at the end you'll have everything to play with OpenStack.
 
 ## The hosts file
 
