@@ -1,4 +1,4 @@
-# OpenStack on a Nuc Shell Playbook
+# OpenStack Packed Lab
 
 This is the playbook I'm using to deploy Red Hat OpenStack Platform on top of my Intel Nuc Skull
 Canyon.
