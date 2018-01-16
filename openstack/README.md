@@ -124,7 +124,7 @@ is specified below:
 
 ```yaml
       images:
-        image_name:
+        name:
           local_path: path/to/the/image
           disk_format: (ami, ari, aki, vhd, vmdk, raw, qcow2, vhdx, vdi, iso or ploop)
           min_disk: size in GB
@@ -150,7 +150,81 @@ The `image_name` will be used as the name in the OpenStack. Below is an example:
 This will create a `rhel` and a `rhel-atomic` image ready to be used. Remember that the paths should
 be local to the host executing the playbook.
 
+#### Flavors Configuration
+
+The `flavours` section allows you to configure the flavors that will be available to use. The
+structure is specified below:
+
+```yaml
+      flavors:
+        name:
+          ram: amount in MB
+          disk: amount in GB
+          ephemeral: amount in GB
+          swap: amount in MB
+          vcpus: number
+```
+
+Each entry will be added using the provided `name`. Below is an example:
+
+```yaml
+      flavors:
+        m1.nano:
+          ram: 128
+          disk: 1
+          ephemeral: 0
+          swap: 0
+          vcpus: 1
+        m1.micro:
+          ram: 256
+          disk: 1
+          ephemeral: 0
+          swap: 0
+          vcpus: 1
+```
+
+#### Lab Configuration
+
+The lab will be created as a project having the `admin` user as its owner. The structure to
+configure the project is specified below:
+
+```yaml
+      lab:
+        floating_ip: number
+        networks:
+          name:
+            cidr: subnet cidr
+            dhcp:
+              start: ip start range
+              end: ip end range
+```
+
+The `floating_ip` defines the number of floating IPs that will be created for you. In the `network`
+section, you can specify networks to create. Below is an example:
+
+```yaml
+      lab:
+        floating_ip: 5
+        networks:
+          workshop:
+            cidr: 10.0.0.0/24
+            dhcp:
+              start: 10.0.0.10
+              end: 10.0.0.100
+          test:
+            cidr: 10.0.1.0/24
+            dhcp:
+              start: 10.0.1.10
+              end: 10.0.1.100
+```
+
+This will create 5 floating IPs and 2 private networks (one named `workshop` and the other named
+`test`) both added to a router that is connected to the external network.
+
 ## Installing OpenStack
 
 To install OpenStack, just run the `install.yml` playbook. It should take a while, specially if
 you have lots of images to create.
+
+At the end you will have a nice and crispy OpenStack lab just waiting for you to launch your
+instances.

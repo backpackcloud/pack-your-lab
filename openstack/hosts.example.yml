@@ -42,11 +42,22 @@ osp:
           ephemeral: 0
           swap: 0
           vcpus: 1
+        m1.micro:
+          ram: 256
+          disk: 1
+          ephemeral: 0
+          swap: 0
+          vcpus: 1
       lab:
         floating_ip: 5
         networks:
-          lab:
+          workshop:
             cidr: 10.0.0.0/24
             dhcp:
               start: 10.0.0.10
               end: 10.0.0.100
+          test:
+            cidr: 10.0.1.0/24
+            dhcp:
+              start: 10.0.1.10
+              end: 10.0.1.100
