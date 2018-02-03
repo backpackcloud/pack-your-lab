@@ -1,0 +1,46 @@
+---
+- hosts: ocp
+  name: Prepare OpenShift Nodes
+
+  tasks:
+    - name: subscribe host
+      redhat_subscription:
+        state: present
+        username: "{{ subscription.user }}"
+        password: "{{ subscription.password }}"
+        pool_ids: "{{ subscription.pool_ids }}"
+
+    - name: disable all repositories
+      shell: subscription-manager repos --disable=*
+
+    - name: enable repos
+      shell: subscription-manager repos --enable={{ item }}
+      with_items:
+        - rhel-7-server-rpms
+        - rhel-7-server-extras-rpms
+        - rhel-7-server-ose-3.7-rpms
+        - rhel-7-fast-datapath-rpms
+
+    - name: install packages
+      yum:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - python2-setuptools
+        - wget
+        - git
+        - net-tools
+        - bind-utils
+        - iptables-services
+        - bridge-utils
+        - bash-completion
+        - kexec-tools
+        - sos
+        - psacct
+        - atomic-openshift-utils
+        - docker
+
+    - name: upgrade all packages
+      yum:
+        name: '*'
+        state: latest

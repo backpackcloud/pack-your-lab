@@ -1,0 +1,14 @@
+---
+- hosts: ocp-master
+  name: Prepare OpenShift Master Node
+
+  tasks:
+    - name: generate ssh key
+      block:
+        - openssl_privatekey:
+            path: /root/.ssh/id_rsa
+        - openssl_publickey:
+            path: /root/.ssh/id_rsa.pub
+            privatekey_path: /root/.ssh/id_rsa
+
+    
