@@ -58,5 +58,5 @@
     - name: create floating ip
       shell: >
         source ~/keystonerc_admin && export OS_PROJECT_NAME=lab && \
-        openstack floating ip create public_network
-      with_sequence: count={{ osp.lab.floating_ip }}
+        openstack floating ip create --floating-ip-address {{ item }} public_network
+      with_items: "{{ osp.lab.floating_ip }}"

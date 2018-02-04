@@ -7,16 +7,20 @@
       shell: packstack --gen-answer-file={{ osp.resource_path }}/packstack-answers.cfg
 
     - name: configure packstack
-      shell: openstack-config --set {{ osp.resource_path }}/packstack-answers.cfg general {{ item.key }} {{ item.value }}
-      with_dict:
-        CONFIG_NEUTRON_OVS_BRIDGE_MAPPINGS: physnet1:br-ex
-        CONFIG_PROVISION_DEMO: n
-        CONFIG_NOVA_NETWORK_PUBIF: "{{ osp.network.nic }}"
-        CONFIG_NEUTRON_OVS_BRIDGE_IFACES: "br-ex:{{ osp.network.nic }}"
+      block:
+        - shell: openstack-config --set {{ osp.resource_path }}/packstack-answers.cfg general {{ item.key }} {{ item.value }}
+          with_dict:
+            CONFIG_NEUTRON_OVS_BRIDGE_MAPPINGS: physnet1:br-ex
+            CONFIG_PROVISION_DEMO: n
+            CONFIG_NOVA_NETWORK_PUBIF: "{{ osp.network.nic }}"
+            CONFIG_NEUTRON_OVS_BRIDGE_IFACES: "br-ex:{{ osp.network.nic }}"
+            CONFIG_NOVA_COMPUTE_PRIVIF: lo
+            CONFIG_NOVA_NETWORK_PRIVIF: lo
+            CONFIG_DEFAULT_PASSWORD: openstack
+            CONFIG_KEYSTONE_ADMIN_PW: openstack
 
-    - name: customize packstack
-      shell: openstack-config --set {{ osp.resource_path }}/packstack-answers.cfg general {{ item.key }} {{ item.value }}
-      with_dict: "{{ osp.packstack }}"
+        - shell: openstack-config --set {{ osp.resource_path }}/packstack-answers.cfg general {{ item.key }} {{ item.value }}
+          with_dict: "{{ osp.packstack }}"
 
     - name: packstack
       shell: packstack --answer-file={{ osp.resource_path }}/packstack-answers.cfg
