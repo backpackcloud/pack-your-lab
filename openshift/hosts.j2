@@ -32,7 +32,7 @@ openshift_master_console_port=8443
 
 openshift_override_hostname_check=true
 
-openshift_disable_check=disk_availability,docker_storage,memory_availability
+openshift_disable_check=disk_availability,memory_availability
 
 openshift_router_selector="region=all-in-one"
 openshift_registry_selector="region=all-in-one"
@@ -41,7 +41,7 @@ openshift_master_cluster_hostname={{ ocp.hostname }}
 openshift_master_cluster_public_hostname={{ ocp.public }}
 openshift_master_default_subdomain={{ ocp.subdomain }}
 
-openshift_template_service_broker_namespaces=['openshift']
+#openshift_template_service_broker_namespaces=['openshift']
 
 [masters]
 {{ ocp.hostname }} openshift_hostname={{ ocp.hostname }}

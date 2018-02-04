@@ -53,6 +53,9 @@
       with_file:
         - "{{ bastion_public_key }}"
 
+    - name: ensure openstack hostname
+      shell: hostname {{ openstack_servername }} && echo "{{ openstack_servername }}" > /etc/hostname
+
     - name: add cloud provider configuration
       block:
         - file:
@@ -62,6 +65,28 @@
         - template:
             src: cloud.conf.j2
             dest: /etc/origin/cloudprovider/openstack.conf
+
+    - name: configure docker storage
+      block:
+        - systemd:
+            state: stopped
+            enabled: no
+            name: docker
+
+        - file:
+            path: /var/lib/docker
+            state: absent
+
+        - template:
+            src: docker-storage-setup.j2
+            dest: /etc/sysconfig/docker-storage-setup
+
+        - shell: docker-storage-setup --reset && docker-storage-setup
+
+        - systemd:
+            state: started
+            enabled: yes
+            name: docker
 
     - name: configure bastion
       block:
