@@ -53,6 +53,16 @@
       with_file:
         - "{{ bastion_public_key }}"
 
+    - name: add cloud provider configuration
+      block:
+        - file:
+            path: /etc/origin/cloudprovider
+            state: directory
+
+        - template:
+            src: cloud.conf.j2
+            dest: /etc/origin/cloudprovider/openstack.conf
+
     - name: configure bastion
       block:
         - copy:
