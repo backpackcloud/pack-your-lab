@@ -1,3 +1,0 @@
----
-- import_playbook: prepare-hosts.yml
-- import_playbook: prepare-master.yml
