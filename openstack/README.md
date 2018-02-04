@@ -196,7 +196,9 @@ configure the project is specified below:
 
 ```yaml
       lab:
-        floating_ip: number
+        floating_ip:
+          - fixed_address_a
+          - fixed_address_b
         networks:
           name:
             cidr: subnet cidr
@@ -205,12 +207,14 @@ configure the project is specified below:
               end: ip end range
 ```
 
-The `floating_ip` defines the number of floating IPs that will be created for you. In the `network`
-section, you can specify networks to create. Below is an example:
+The `floating_ip` defines floating IPs that will be created for you. In the `network` section, you
+can specify networks to create. Below is an example:
 
 ```yaml
       lab:
-        floating_ip: 5
+        floating_ip:
+          - 192.168.0.30
+          - 192.168.0.31
         networks:
           workshop:
             cidr: 10.0.0.0/24
@@ -224,7 +228,7 @@ section, you can specify networks to create. Below is an example:
               end: 10.0.1.100
 ```
 
-This will create 5 floating IPs and 2 private networks (one named `workshop` and the other named
+This will create 2 floating IPs and 2 private networks (one named `workshop` and the other named
 `test`) both added to a router that is connected to the external network.
 
 ## Installing OpenStack

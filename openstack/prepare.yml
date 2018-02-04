@@ -37,6 +37,12 @@
         - yum-utils
         - openstack-utils
         - openstack-packstack
+        - bash-completion
+
+    - name: upgrade all packages
+      yum:
+        name: '*'
+        state: latest
 
     - name: disable network manager
       shell: >
