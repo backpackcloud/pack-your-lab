@@ -3,17 +3,17 @@
   name: Prepare OpenShift Nodes
 
   tasks:
-    - name: subscribe host
+    - name: Subscribe host
       redhat_subscription:
         state: present
         username: "{{ subscription.user }}"
         password: "{{ subscription.password }}"
         pool_ids: "{{ subscription.pool_ids }}"
 
-    - name: disable all repositories
+    - name: Disable all repositories
       shell: subscription-manager repos --disable=*
 
-    - name: enable repos
+    - name: Enable repos
       shell: subscription-manager repos --enable={{ item }}
       with_items:
         - rhel-7-server-rpms
@@ -21,7 +21,7 @@
         - rhel-7-server-ose-3.7-rpms
         - rhel-7-fast-datapath-rpms
 
-    - name: install packages
+    - name: Install packages
       yum:
         name: "{{ item }}"
         state: present
@@ -40,12 +40,12 @@
         - atomic-openshift-utils
         - docker
 
-    - name: upgrade all packages
+    - name: Update packages
       yum:
         name: '*'
         state: latest
 
-    - name: add authorized key
+    - name: Add authorized key
       authorized_key:
         user: cloud-user
         state: present
@@ -53,64 +53,72 @@
       with_file:
         - "{{ bastion_public_key }}"
 
-    - name: ensure openstack hostname
+    - name: Ensure openstack hostname
       shell: hostname {{ openstack_servername }} && echo "{{ openstack_servername }}" > /etc/hostname
 
-    - name: add cloud provider configuration
+    - name: Configure docker storage
       block:
-        - file:
-            path: /etc/origin/cloudprovider
-            state: directory
-
-        - template:
-            src: cloud.conf.j2
-            dest: /etc/origin/cloudprovider/openstack.conf
-
-    - name: configure docker storage
-      block:
-        - systemd:
+        - name: Stop docker service
+          systemd:
             state: stopped
             enabled: no
             name: docker
 
-        - file:
+        - name: Remove /var/lib/docker directory
+          file:
             path: /var/lib/docker
             state: absent
 
-        - template:
+        - name: Copy docker-storage-setup file
+          template:
             src: docker-storage-setup.j2
             dest: /etc/sysconfig/docker-storage-setup
 
-        - shell: docker-storage-setup --reset && docker-storage-setup
+        - name: Reset docker storage setup
+          shell: docker-storage-setup --reset
 
-        - systemd:
+        - name: Setup docker storage
+          shell: docker-storage-setup
+
+        - name: Start and enable docker service
+          systemd:
             state: started
             enabled: yes
             name: docker
 
-    - name: configure bastion
+    - name: Configure bastion
       block:
-        - copy:
+        - name: Copy private key
+          copy:
             src: "{{ bastion_private_key }}"
             dest: "/root/.ssh/id_rsa"
             mode: 0600
 
-        - copy:
+        - name: Copy public key
+          copy:
             src: "{{ bastion_public_key }}"
             dest: "/root/.ssh/id_rsa.pub"
             mode: 0644
 
-        - template:
-            src: hosts.j2
+        - name: Copy ansible inventory file
+          template:
+            src: hosts-all-in-one.j2
             dest: /etc/ansible/hosts
 
-        - lineinfile:
+        - name: Disable ansible host key checking
+          lineinfile:
             path: /etc/ansible/ansible.cfg
             regexp: "^#host_key_checking = False"
             line: "host_key_checking = False"
             
-        - lineinfile:
+        - name: Increase ansible timeout
+          lineinfile:
             path: /etc/ansible/ansible.cfg
             regexp: "^#timeout = 10"
             line: "timeout = 30"
+
+        - name: Patch openstack configuration file
+          copy:
+            src: openstack.conf.j2
+            dest: /usr/share/ansible/openshift-ansible/roles/openshift_cloud_provider/templates/openstack.conf.j2
       when: bastion

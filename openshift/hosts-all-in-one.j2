@@ -20,12 +20,13 @@ openshift_cloudprovider_openstack_username={{ osp.auth.username }}
 openshift_cloudprovider_openstack_password={{ osp.auth.password }}
 openshift_cloudprovider_openstack_domain_name={{ osp.auth.user_domain_name }}
 openshift_cloudprovider_openstack_tenant_name=lab
-
-osm_use_cockpit=true
-osm_cockpit_plugins=['cockpit-kubernetes']
+openshift_cloudprovider_openstack_blockstorage_version=v2
 
 openshift_metrics_install_metrics=true
+openshift_metrics_cassandra_storage_type=dynamic
+
 openshift_logging_install_logging=true
+openshift_logging_storage_kind=dynamic
 
 openshift_master_api_port=8443
 openshift_master_console_port=8443
@@ -34,14 +35,14 @@ openshift_override_hostname_check=true
 
 openshift_disable_check=disk_availability,memory_availability
 
-openshift_router_selector="region=all-in-one"
-openshift_registry_selector="region=all-in-one"
+openshift_router_selector="region=infra"
+openshift_registry_selector="region=infra"
 
 openshift_master_cluster_hostname={{ ocp.hostname }}
 openshift_master_cluster_public_hostname={{ ocp.public }}
 openshift_master_default_subdomain={{ ocp.subdomain }}
 
-#openshift_template_service_broker_namespaces=['openshift']
+openshift_template_service_broker_namespaces=['openshift']
 
 [masters]
 {{ ocp.hostname }} openshift_hostname={{ ocp.hostname }}
@@ -50,4 +51,4 @@ openshift_master_default_subdomain={{ ocp.subdomain }}
 {{ ocp.hostname }} openshift_hostname={{ ocp.hostname }}
 
 [nodes]
-{{ ocp.hostname }} openshift_hostname={{ ocp.hostname }} ansible_connection=local openshift_schedulable=true openshift_node_labels="{'region': 'all-in-one', 'zone': 'default'}"
+{{ ocp.hostname }} openshift_hostname={{ ocp.hostname }} ansible_connection=local openshift_schedulable=true openshift_node_labels="{'region': 'infra', 'zone': 'default'}"
