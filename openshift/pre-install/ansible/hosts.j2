@@ -45,10 +45,20 @@ openshift_master_default_subdomain={{ ocp.subdomain }}
 openshift_template_service_broker_namespaces=['openshift']
 
 [masters]
-{{ ocp.hostname }} openshift_hostname={{ ocp.hostname }}
+{% for node in ocp.nodes %}
+{% if node.master %}
+{{ node.hostname }} openshift_hostname={{ node.hostname }}
+{% endif %}
+{% endfor %}
 
 [etcd]
-{{ ocp.hostname }} openshift_hostname={{ ocp.hostname }}
+{% for node in ocp.nodes %}
+{% if node.etcd %}
+{{ node.hostname }} openshift_hostname={{ node.hostname }}
+{% endif %}
+{% endfor %}
 
 [nodes]
-{{ ocp.hostname }} openshift_hostname={{ ocp.hostname }} ansible_connection=local openshift_schedulable=true openshift_node_labels="{'region': 'infra', 'zone': 'default'}"
+{% for node in ocp.nodes %}
+{{ node.hostname }} openshift_hostname={{ node.hostname }} {% if node.bastion %}ansible_connection=local{% endif %} {% if node.schedulable %}openshift_schedulable=true{% endif %} openshift_node_labels="{ {% if node.infra %}'region': 'infra',{% endif %} 'zone': 'default' }"
+{% endfor %}

@@ -1,0 +1,15 @@
+---
+- hosts: ocp
+  name: Configure Installed Openshift
+
+  tasks:
+    - block:
+      - name: Give cluster-admin access to defined user
+        shell: >
+          oc adm policy add-cluster-role-to-user cluster-admin {{ ocp.cluster_admin_user }}
+
+      - name: Install Examples
+        shell: >
+          find -L /usr/share/ansible/openshift-ansible/roles/openshift_examples/files/examples/latest \
+            -name "*.yaml" -o -name "*.json" -exec oc create -n openshift -f {} \;
+      when: bastion
