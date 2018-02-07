@@ -22,21 +22,22 @@ openshift_cloudprovider_openstack_domain_name={{ osp.auth.user_domain_name }}
 openshift_cloudprovider_openstack_tenant_name=lab
 openshift_cloudprovider_openstack_blockstorage_version=v2
 
+{% if ocp.deploy_metrics %}
 openshift_metrics_install_metrics=true
 openshift_metrics_cassandra_storage_type=dynamic
+{% endif %}
 
+{% if ocp.deploy_logging %}
 openshift_logging_install_logging=true
 openshift_logging_storage_kind=dynamic
+{% endif %}
 
 openshift_master_api_port=8443
 openshift_master_console_port=8443
 
 openshift_override_hostname_check=true
 
-openshift_disable_check=disk_availability,memory_availability
-
-openshift_router_selector="region=infra"
-openshift_registry_selector="region=infra"
+openshift_disable_check=disk_availability,memory_availability,docker_image_availability
 
 openshift_master_cluster_hostname={{ ocp.hostname }}
 openshift_master_cluster_public_hostname={{ ocp.public }}

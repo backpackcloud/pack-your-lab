@@ -1,0 +1,8 @@
+---
+- hosts: osp
+  name: Create Servers on OpenStack
+
+  tasks:
+    - name: Create servers
+      shell: >
+        

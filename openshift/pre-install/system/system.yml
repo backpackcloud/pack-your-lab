@@ -9,9 +9,13 @@
         username: "{{ subscription.user }}"
         password: "{{ subscription.password }}"
         pool_ids: "{{ subscription.pool_ids }}"
+      retries: 10
+      delay: 5
 
     - name: Disable all repositories
       shell: subscription-manager repos --disable=*
+      retries: 10
+      delay: 5
 
     - name: Enable repos
       shell: subscription-manager repos --enable={{ item }}
@@ -20,6 +24,8 @@
         - rhel-7-server-extras-rpms
         - rhel-7-server-ose-3.7-rpms
         - rhel-7-fast-datapath-rpms
+      retries: 10
+      delay: 5
 
     - name: Install packages
       yum:
@@ -39,11 +45,15 @@
         - psacct
         - atomic-openshift-utils
         - docker
+      retries: 10
+      delay: 5
 
     - name: Update packages
       yum:
         name: '*'
         state: latest
+      retries: 10
+      delay: 5
 
     - name: Ensure openstack hostname
       shell: hostname {{ openstack_servername }} && echo "{{ openstack_servername }}" > /etc/hostname
