@@ -1,5 +1,4 @@
 ---
-- import_playbook: pre-install/dns/config.yml
 - import_playbook: pre-install/system/system.yml
 - import_playbook: pre-install/keys/keys.yml
 - import_playbook: pre-install/docker-storage/docker-storage.yml

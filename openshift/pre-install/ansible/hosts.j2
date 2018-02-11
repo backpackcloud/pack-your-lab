@@ -30,6 +30,7 @@ openshift_metrics_cassandra_storage_type=dynamic
 {% if ocp.deploy_logging %}
 openshift_logging_install_logging=true
 openshift_logging_storage_kind=dynamic
+openshift_logging_es_memory_limit=2Gi
 {% endif %}
 
 openshift_master_api_port=8443
@@ -39,27 +40,27 @@ openshift_override_hostname_check=true
 
 openshift_disable_check=disk_availability,memory_availability,docker_image_availability
 
-openshift_master_cluster_hostname={{ ocp.hostname }}
-openshift_master_cluster_public_hostname={{ ocp.public }}
+openshift_master_cluster_hostname={{ ocp.console }}
+openshift_master_cluster_public_hostname={{ ocp.console }}
 openshift_master_default_subdomain={{ ocp.subdomain }}
 
 openshift_template_service_broker_namespaces=['openshift']
 
 [masters]
-{% for node in ocp.nodes %}
-{% if node.master %}
-{{ node.hostname }} openshift_hostname={{ node.hostname }}
+{% for host in groups['ocp'] %}
+{% if hostvars[host]["master"] %}
+{{ host }} openshift_hostname={{ host }}
 {% endif %}
 {% endfor %}
 
 [etcd]
-{% for node in ocp.nodes %}
-{% if node.etcd %}
-{{ node.hostname }} openshift_hostname={{ node.hostname }}
+{% for host in groups['ocp'] %}
+{% if hostvars[host]["etcd"] %}
+{{ host }} openshift_hostname={{ host }}
 {% endif %}
 {% endfor %}
 
 [nodes]
-{% for node in ocp.nodes %}
-{{ node.hostname }} openshift_hostname={{ node.hostname }} {% if node.bastion %}ansible_connection=local{% endif %} {% if node.schedulable %}openshift_schedulable=true{% endif %} openshift_node_labels="{ {% if node.infra %}'region': 'infra',{% endif %} 'zone': 'default' }"
+{% for host in groups['ocp'] %}
+{{ host }} openshift_hostname={{ host }} {% if hostvars[host]["bastion"] %}ansible_connection=local{% endif %} openshift_schedulable={{ hostvars[host]["schedulable"] }} openshift_node_labels="{ {% if hostvars[host]["infra"] %}'region': 'infra',{% endif %} 'zone': 'default' }"
 {% endfor %}

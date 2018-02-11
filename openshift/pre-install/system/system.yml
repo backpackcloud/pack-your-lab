@@ -56,4 +56,4 @@
       delay: 5
 
     - name: Ensure openstack hostname
-      shell: hostname {{ openstack_servername }} && echo "{{ openstack_servername }}" > /etc/hostname
+      shell: hostname {{ inventory_hostname }} && echo "{{ inventory_hostname }}" > /etc/hostname

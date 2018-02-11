@@ -12,4 +12,4 @@
         shell: >
           find -L /usr/share/ansible/openshift-ansible/roles/openshift_examples/files/examples/latest \
             -name "*.yaml" -o -name "*.json" -exec oc create -n openshift -f {} \;
-      when: bastion
+      when: (bastion is defined) and bastion
