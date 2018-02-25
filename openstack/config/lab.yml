@@ -52,7 +52,13 @@
           --ingress \
           --protocol tcp \
           --ethertype IPv4 \
-          --dst-port 22 \
+          --dst-port 1:65535 \
+          {{ security_group_id.stdout }} && \
+        openstack security group rule create \
+          --ingress \
+          --protocol udp \
+          --ethertype IPv4 \
+          --dst-port 1:65535 \
           {{ security_group_id.stdout }}
 
     - name: create floating ip

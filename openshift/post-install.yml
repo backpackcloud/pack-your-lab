@@ -8,8 +8,14 @@
         shell: >
           oc adm policy add-cluster-role-to-user cluster-admin {{ ocp.cluster_admin_user }}
 
-      - name: Install Examples
+      - name: Add Custom Templates
+        copy:
+          src: post-install/templates/
+          dest: /usr/share/ansible/openshift-ansible/roles/openshift_examples/files/examples/latest/custom/
+
+      - name: Install Custom Templates
         shell: >
-          find -L /usr/share/ansible/openshift-ansible/roles/openshift_examples/files/examples/latest \
-            -name "*.yaml" -o -name "*.json" -exec oc create -n openshift -f {} \;
+          find -L /usr/share/ansible/openshift-ansible/roles/openshift_examples/files/examples/latest/custom \
+            -name "*.yml" -o -name "*.json" -exec oc create -n openshift -f {} \;
+      
       when: (bastion is defined) and bastion

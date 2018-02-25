@@ -10,7 +10,7 @@ ansible_become=yes
 openshift_deployment_type=openshift-enterprise
 openshift_release=v3.7
 
-openshift_install_examples=false
+openshift_install_examples=true
 
 openshift_master_identity_providers=[{'name': 'allow_all', 'login': 'true', 'challenge': 'true', 'kind': 'AllowAllPasswordIdentityProvider'}]
 
@@ -33,8 +33,15 @@ openshift_logging_storage_kind=dynamic
 openshift_logging_es_memory_limit=2Gi
 {% endif %}
 
-openshift_master_api_port=8443
-openshift_master_console_port=8443
+{% set master_port = '443' %}
+{% for host in groups['ocp'] %}
+{% if hostvars[host]["master"] and hostvars[host]["infra"] %}
+{% set master_port = '8443' %}
+{% endif %}
+{% endfor %}
+
+openshift_master_api_port={{ master_port }}
+openshift_master_console_port={{ master_port }}
 
 openshift_override_hostname_check=true
 
@@ -45,6 +52,12 @@ openshift_master_cluster_public_hostname={{ ocp.console }}
 openshift_master_default_subdomain={{ ocp.subdomain }}
 
 openshift_template_service_broker_namespaces=['openshift']
+
+openshift_hosted_registry_storage_kind=openstack
+openshift_hosted_registry_storage_access_modes=['ReadWriteOnce']
+openshift_hosted_registry_storage_openstack_filesystem=ext4
+openshift_hosted_registry_storage_openstack_volumeID={{ ocp.registry.volume.id }}
+openshift_hosted_registry_storage_volume_size={{ ocp.registry.volume.size }}
 
 [masters]
 {% for host in groups['ocp'] %}
