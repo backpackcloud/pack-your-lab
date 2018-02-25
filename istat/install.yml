@@ -1,0 +1,47 @@
+---
+- hosts: all
+  name: Install iStat Server
+
+  tasks:
+    - name: Install required packages
+      yum:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - gcc-c++
+        - autoconf
+        - automake
+        - libxml2-devel
+        - openssl-devel
+        - sqlite-devel
+
+    - name: Install optional packages
+      yum:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - lm_sensors
+        - lm_sensors-devel
+      when: (baremetal is defined) and baremetal
+
+    - name: Extract source package
+      unarchive:
+        src: "{{ istat.download_url }}"
+        dest: /root/
+        remote_src: yes
+
+    - name: Build iStat
+      shell: >
+        cd /root/istatserver-* && ./autogen && ./configure && make && make install && \
+           cp ./resource/systemd/istatserver.service /etc/systemd/system/istatserver.service
+
+    - name: Copy configuration file
+      template:
+        src: istatserver.conf.j2
+        dest: /usr/local/etc/istatserver/istatserver.conf
+
+    - name: Enable iStat service
+      systemd:
+        name: istatserver
+        state: started
+        enabled: yes
