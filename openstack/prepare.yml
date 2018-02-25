@@ -1,6 +1,5 @@
 ---
 - hosts: osp
-  remote_user: root
   name: Prepare OpenStack Installation
 
   tasks:
@@ -37,7 +36,9 @@
         - yum-utils
         - openstack-utils
         - openstack-packstack
+        - openstack-nova-migration
         - bash-completion
+        - vim
 
     - name: upgrade all packages
       yum:

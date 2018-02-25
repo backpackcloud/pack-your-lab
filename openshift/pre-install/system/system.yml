@@ -1,0 +1,59 @@
+---
+- hosts: ocp
+  name: Prepare System
+
+  tasks:
+    - name: Subscribe host
+      redhat_subscription:
+        state: present
+        username: "{{ subscription.user }}"
+        password: "{{ subscription.password }}"
+        pool_ids: "{{ subscription.pool_ids }}"
+      retries: 10
+      delay: 5
+
+    - name: Disable all repositories
+      shell: subscription-manager repos --disable=*
+      retries: 10
+      delay: 5
+
+    - name: Enable repos
+      shell: subscription-manager repos --enable={{ item }}
+      with_items:
+        - rhel-7-server-rpms
+        - rhel-7-server-extras-rpms
+        - rhel-7-server-ose-3.7-rpms
+        - rhel-7-fast-datapath-rpms
+      retries: 10
+      delay: 5
+
+    - name: Install packages
+      yum:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - python2-setuptools
+        - wget
+        - git
+        - net-tools
+        - bind-utils
+        - iptables-services
+        - bridge-utils
+        - bash-completion
+        - kexec-tools
+        - sos
+        - psacct
+        - atomic-openshift-utils
+        - docker
+      retries: 10
+      delay: 5
+
+    - name: Update packages
+      yum:
+        name: '*'
+        state: latest
+      retries: 10
+      delay: 5
+
+    - name: Ensure openstack hostname
+      shell: hostname {{ inventory_hostname }} && echo "{{ inventory_hostname }}" > /etc/hostname

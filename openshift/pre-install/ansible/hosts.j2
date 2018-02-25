@@ -1,0 +1,79 @@
+[OSEv3:children]
+masters
+nodes
+etcd
+
+[OSEv3:vars]
+ansible_ssh_user=cloud-user
+ansible_become=yes
+
+openshift_deployment_type=openshift-enterprise
+openshift_release=v3.7
+
+openshift_install_examples=true
+
+openshift_master_identity_providers=[{'name': 'allow_all', 'login': 'true', 'challenge': 'true', 'kind': 'AllowAllPasswordIdentityProvider'}]
+
+openshift_cloudprovider_kind=openstack
+openshift_cloudprovider_openstack_auth_url={{ osp.auth.auth_url }}
+openshift_cloudprovider_openstack_username={{ osp.auth.username }}
+openshift_cloudprovider_openstack_password={{ osp.auth.password }}
+openshift_cloudprovider_openstack_domain_name={{ osp.auth.user_domain_name }}
+openshift_cloudprovider_openstack_tenant_name=lab
+openshift_cloudprovider_openstack_blockstorage_version=v2
+
+{% if ocp.deploy_metrics %}
+openshift_metrics_install_metrics=true
+openshift_metrics_cassandra_storage_type=dynamic
+{% endif %}
+
+{% if ocp.deploy_logging %}
+openshift_logging_install_logging=true
+openshift_logging_storage_kind=dynamic
+openshift_logging_es_memory_limit=2Gi
+{% endif %}
+
+{% set master_port = '443' %}
+{% for host in groups['ocp'] %}
+{% if hostvars[host]["master"] and hostvars[host]["infra"] %}
+{% set master_port = '8443' %}
+{% endif %}
+{% endfor %}
+
+openshift_master_api_port={{ master_port }}
+openshift_master_console_port={{ master_port }}
+
+openshift_override_hostname_check=true
+
+openshift_disable_check=disk_availability,memory_availability,docker_image_availability
+
+openshift_master_cluster_hostname={{ ocp.console }}
+openshift_master_cluster_public_hostname={{ ocp.console }}
+openshift_master_default_subdomain={{ ocp.subdomain }}
+
+openshift_template_service_broker_namespaces=['openshift']
+
+openshift_hosted_registry_storage_kind=openstack
+openshift_hosted_registry_storage_access_modes=['ReadWriteOnce']
+openshift_hosted_registry_storage_openstack_filesystem=ext4
+openshift_hosted_registry_storage_openstack_volumeID={{ ocp.registry.volume.id }}
+openshift_hosted_registry_storage_volume_size={{ ocp.registry.volume.size }}
+
+[masters]
+{% for host in groups['ocp'] %}
+{% if hostvars[host]["master"] %}
+{{ host }} openshift_hostname={{ host }}
+{% endif %}
+{% endfor %}
+
+[etcd]
+{% for host in groups['ocp'] %}
+{% if hostvars[host]["etcd"] %}
+{{ host }} openshift_hostname={{ host }}
+{% endif %}
+{% endfor %}
+
+[nodes]
+{% for host in groups['ocp'] %}
+{{ host }} openshift_hostname={{ host }} {% if hostvars[host]["bastion"] %}ansible_connection=local{% endif %} openshift_schedulable={{ hostvars[host]["schedulable"] }} openshift_node_labels="{ {% if hostvars[host]["infra"] %}'region': 'infra',{% endif %} 'zone': 'default' }"
+{% endfor %}

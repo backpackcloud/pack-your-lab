@@ -1,0 +1,34 @@
+---
+- hosts: ocp
+  name: Prepare Docker Storage
+
+  tasks:
+    - name: Configure docker storage
+      block:
+        - name: Stop docker service
+          systemd:
+            state: stopped
+            enabled: no
+            name: docker
+
+        - name: Remove /var/lib/docker directory
+          file:
+            path: /var/lib/docker
+            state: absent
+
+        - name: Copy docker-storage-setup file
+          template:
+            src: docker-storage-setup.j2
+            dest: /etc/sysconfig/docker-storage-setup
+
+        - name: Reset docker storage setup
+          shell: docker-storage-setup --reset
+
+        - name: Setup docker storage
+          shell: docker-storage-setup
+
+        - name: Start and enable docker service
+          systemd:
+            state: started
+            enabled: yes
+            name: docker

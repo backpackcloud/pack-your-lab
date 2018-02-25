@@ -1,0 +1,10 @@
+---
+- hosts: ocp
+  name: Prepare Ansible Inventory
+
+  tasks:
+    - name: Copy ansible inventory file
+      template:
+        src: hosts.j2
+        dest: /etc/ansible/hosts
+      when: (bastion is defined) and bastion
