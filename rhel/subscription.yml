@@ -1,0 +1,22 @@
+---
+- hosts: all
+  name: Subscription
+
+  tasks:
+  - name: Subscribe host
+    redhat_subscription:
+      state: present
+      username: "{{ subscription.user }}"
+      password: "{{ subscription.password }}"
+      pool_ids: "{{ subscription.pool_ids }}"
+
+  - name: Disable all repositories
+    shell: subscription-manager repos --disable=*
+    retries: 10
+    delay: 5
+
+  - name: Enable repos
+    shell: subscription-manager repos --enable={{ item }}
+    with_items: "{{ subscription.repos }}"
+    retries: 10
+    delay: 5
