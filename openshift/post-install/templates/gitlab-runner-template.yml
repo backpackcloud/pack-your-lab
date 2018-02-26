@@ -102,9 +102,6 @@ objects:
         - name: scripts
           configMap:
             name: ${APPLICATION_NAME}-scripts
-        - name: docker
-          hostPath:
-            path: /var/run/docker.sock
         containers:
         - name: gitlab-runner
           image: gitlab-runner
