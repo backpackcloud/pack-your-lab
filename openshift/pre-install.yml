@@ -1,4 +1,5 @@
 ---
+- import_playbook: pre-install/servers/create.yml
 - import_playbook: pre-install/system/system.yml
 - import_playbook: pre-install/keys/keys.yml
 - import_playbook: pre-install/docker-storage/docker-storage.yml
