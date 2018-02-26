@@ -1,0 +1,12 @@
+---
+- import_playbook: pre-install.yml
+
+- hosts: ocp
+  name: Call OpenShift Ansible Installer
+  tasks:
+    - name: Install OpenShift
+      shell: >
+        ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/byo/config.yml
+      when: (bastion is defined) and bastion
+
+- import_playbook: post-install.yml

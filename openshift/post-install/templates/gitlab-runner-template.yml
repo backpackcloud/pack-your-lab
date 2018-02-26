@@ -102,6 +102,9 @@ objects:
         - name: scripts
           configMap:
             name: ${APPLICATION_NAME}-scripts
+        - name: docker
+          hostPath:
+            path: /var/run/docker.sock
         containers:
         - name: gitlab-runner
           image: gitlab-runner
@@ -134,22 +137,6 @@ objects:
           volumeMounts:
           - name: scripts
             mountPath: /scripts
-          livenessProbe:
-            exec:
-              command: ["/usr/bin/pgrep","gitlab-ci-multi"]
-            initialDelaySeconds: 60
-            timeoutSeconds: 1
-            periodSeconds: 10
-            successThreshold: 1
-            failureThreshold: 3
-          readinessProbe:
-            exec:
-              command: ["/usr/bin/pgrep","gitlab-ci-multi"]
-            initialDelaySeconds: 10
-            timeoutSeconds: 1
-            periodSeconds: 10
-            successThreshold: 1
-            failureThreshold: 3
           terminationMessagePath: "/dev/termination-log"
           imagePullPolicy: IfNotPresent
           securityContext:
