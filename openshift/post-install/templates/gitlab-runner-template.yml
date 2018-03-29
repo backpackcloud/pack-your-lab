@@ -49,9 +49,16 @@ objects:
       /entrypoint register --non-interactive \
         --url $GITLAB_URL \
         --executor kubernetes
+      # Add docker.sock volumes
+      cat /scripts/docker.sock.toml >> /etc/gitlab-runner/config.toml
       # Start the runner
       /entrypoint run --user=gitlab-runner \
         --working-directory=/home/gitlab-runner
+    docker.sock.toml: |2
+          [[runners.kubernetes.volumes.host_path]]
+            name = "docker-sock"
+            mount_path = "/var/run/docker.sock"
+            host_path = "/var/run/docker.sock"
     config.toml: |
       concurrent = 10
       check_interval = 10
