@@ -1,0 +1,85 @@
+all:
+  children:
+    osp:
+      hosts:
+        openstack.example.com:
+          ansible_user: root
+    ocp:
+      vars:
+        ansible_user: cloud-user
+        ansible_become: yes
+
+        bastion_private_key: ~/some-path/ocp-master
+        bastion_public_key: ~/some-path/ocp-master.pub
+
+        bastion: false
+        infra: false
+        master: false
+        etcd: false
+        schedulable: false
+
+        flavor: ocp.node
+        key_name: openstack-keypair
+        network: lab
+        image: rhel
+      hosts:
+        ocp-master.example.com:
+          bastion: true
+          master: true
+          etcd: true
+          schedulable: false
+          internal_ip: 10.0.1.17
+          external_ip: 192.168.0.31
+          docker_storage:
+            device: /dev/vdc
+            name: docker-vg
+            volume: ocp-master-docker-storage
+            size: 25
+        ocp-infra.example.com:
+          infra: true
+          internal_ip: 10.0.1.15
+          external_ip: 192.168.0.32
+          docker_storage:
+            device: /dev/vdc
+            name: docker-vg
+            volume: ocp-infra-docker-storage
+            size: 25
+        ocp-app-1.example.com:
+          internal_ip: 10.0.1.14
+          external_ip: 192.168.0.33
+          docker_storage:
+            device: /dev/vdc
+            name: docker-vg
+            volume: ocp-app-1-docker-storage
+            size: 25
+        ocp-app-2.example.com:
+          internal_ip: 10.0.1.16
+          external_ip: 192.168.0.34
+          docker_storage:
+            device: /dev/vdc
+            name: docker-vg
+            volume: ocp-app-2-docker-storage
+            size: 25
+  vars:
+    subscription:
+      user: my-portal-user
+      password: "my-porta-password"
+      pool_ids:
+        - pool_id
+    ocp:
+      deploy_metrics: true
+      deploy_logging: true
+      subdomain: cloud.example.com
+      console: openshift.example.com
+      registry:
+        volume:
+          id: e7fe29c5-a4bd-4640-b647-8a6555853e23
+          size: 50Gi
+      cluster_admin_user: admin
+    osp:
+      auth:
+        auth_url: http://openstack.example.com:5000/v3
+        username: admin
+        password: openstack
+        user_domain_name: Default
+        project_name: admin
