@@ -45,3 +45,14 @@
         name: istatserver
         state: started
         enabled: yes
+
+    - name: Add iptables rule
+      lineinfile:
+        path: /etc/sysconfig/iptables
+        insertafter: -A INPUT -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT
+        line: -A INPUT -p tcp -m state --state NEW -m tcp --dport 5109 -j ACCEPT
+
+    - name: Restart iptables service
+      systemd:
+        name: iptables
+        state: restarted
