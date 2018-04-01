@@ -15,9 +15,3 @@
           path: /etc/ansible/ansible.cfg
           regexp: "^#timeout = 10"
           line: "timeout = 60"
-
-      - name: Patch openstack configuration file
-        copy:
-          src: openstack.conf.j2
-          dest: /usr/share/ansible/openshift-ansible/roles/openshift_cloud_provider/templates/openstack.conf.j2
-      when: (bastion is defined) and bastion

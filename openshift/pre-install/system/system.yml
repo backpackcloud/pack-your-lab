@@ -22,8 +22,9 @@
       with_items:
         - rhel-7-server-rpms
         - rhel-7-server-extras-rpms
-        - rhel-7-server-ose-3.7-rpms
+        - rhel-7-server-ose-3.9-rpms
         - rhel-7-fast-datapath-rpms
+        - rhel-7-server-ansible-2.4-rpms
       retries: 10
       delay: 5
 
@@ -44,7 +45,7 @@
         - sos
         - psacct
         - atomic-openshift-utils
-        - docker
+        - docker-1.13.1
       retries: 10
       delay: 5
 

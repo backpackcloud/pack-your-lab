@@ -8,7 +8,7 @@ ansible_ssh_user=cloud-user
 ansible_become=yes
 
 openshift_deployment_type=openshift-enterprise
-openshift_release=v3.7
+openshift_release=v3.9
 
 openshift_install_examples=true
 
@@ -47,6 +47,11 @@ openshift_override_hostname_check=true
 
 openshift_disable_check=disk_availability,memory_availability,docker_image_availability
 
+{% if ocp.additional_registries is defined %}
+openshift_docker_insecure_registries={{ ocp.additional_registries }}
+openshift_docker_additional_registries={{ ocp.additional_registries }}
+{% endif %}
+
 openshift_master_cluster_hostname={{ ocp.console }}
 openshift_master_cluster_public_hostname={{ ocp.console }}
 openshift_master_default_subdomain={{ ocp.subdomain }}
@@ -58,6 +63,11 @@ openshift_hosted_registry_storage_access_modes=['ReadWriteOnce']
 openshift_hosted_registry_storage_openstack_filesystem=ext4
 openshift_hosted_registry_storage_openstack_volumeID={{ ocp.registry.volume.id }}
 openshift_hosted_registry_storage_volume_size={{ ocp.registry.volume.size }}
+
+openshift_hosted_etcd_storage_kind=dynamic
+openshift_hosted_etcd_storage_access_modes=["ReadWriteOnce"]
+openshift_hosted_etcd_storage_volume_size=1G
+openshift_hosted_etcd_storage_labels={'storage': 'etcd'}
 
 [masters]
 {% for host in groups['ocp'] %}
@@ -75,5 +85,5 @@ openshift_hosted_registry_storage_volume_size={{ ocp.registry.volume.size }}
 
 [nodes]
 {% for host in groups['ocp'] %}
-{{ host }} openshift_hostname={{ host }} {% if hostvars[host]["bastion"] %}ansible_connection=local{% endif %} openshift_schedulable={{ hostvars[host]["schedulable"] }} openshift_node_labels="{ {% if hostvars[host]["infra"] %}'region': 'infra',{% endif %} 'zone': 'default' }"
+{{ host }} openshift_hostname={{ host }} {% if hostvars[host]["bastion"] %}ansible_connection=local{% endif %} openshift_node_labels="{ {% if hostvars[host]["infra"] %}'region': 'infra',{% endif %} 'zone': 'default' }"
 {% endfor %}
