@@ -4,14 +4,16 @@
 - hosts: ocp
   name: Call OpenShift Ansible Installer
   tasks:
-    - name: Run Pre Requisites Playbook
-      shell: >
-        ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/prerequisites.yml
-      when: (bastion is defined) and bastion
+    - block:
 
-    - name: Run Install Playbook
-      shell: >
-        ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml
+      - name: Run Pre Requisites Playbook
+        shell: >
+          ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/prerequisites.yml > /tmp/ansible.log
+
+      - name: Run Install Playbook
+        shell: >
+          ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml > /tmp/ansible.log
+
       when: (bastion is defined) and bastion
 
 - import_playbook: post-install.yml
