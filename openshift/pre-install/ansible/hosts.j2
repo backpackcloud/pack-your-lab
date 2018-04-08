@@ -47,6 +47,8 @@ openshift_override_hostname_check=true
 
 openshift_disable_check=disk_availability,memory_availability,docker_image_availability
 
+osm_api_server_args={'deserialization-cache-size': ['1000']}
+
 {% if ocp.additional_registries is defined %}
 openshift_docker_insecure_registries={{ ocp.additional_registries }}
 openshift_docker_additional_registries={{ ocp.additional_registries }}
