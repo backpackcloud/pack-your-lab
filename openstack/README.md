@@ -236,5 +236,14 @@ This will create 2 floating IPs and 2 private networks (one named `workshop` and
 To install OpenStack, just run the `install.yml` playbook. It should take a while, specially if
 you have lots of images to create.
 
+If for some dark reason Packstack fails, try to run db sync on the components and run packstack
+manually:
+
+```
+cinder-manage db sync
+nova-manage db sync
+keystone-manage db_sync
+```
+
 At the end you will have a nice and crispy OpenStack lab just waiting for you to launch your
 instances.
