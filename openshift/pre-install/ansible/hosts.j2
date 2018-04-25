@@ -87,5 +87,5 @@ openshift_hosted_etcd_storage_labels={'storage': 'etcd'}
 
 [nodes]
 {% for host in groups['ocp'] %}
-{{ host }} openshift_hostname={{ host }} {% if hostvars[host]["bastion"] %}ansible_connection=local{% endif %} openshift_node_labels="{ {% if hostvars[host]["infra"] %}'region': 'infra',{% endif %} 'zone': 'default' }"
+{{ host }} openshift_hostname={{ host }} {% if hostvars[host]["bastion"] %}ansible_connection=local{% endif %} openshift_node_labels="{ {% if hostvars[host]["infra"] %}'region': 'infra',{% endif %} 'zone': 'default'}"
 {% endfor %}
