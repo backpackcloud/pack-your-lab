@@ -1,0 +1,31 @@
+- hosts: osp
+  name: Create Servers
+
+  tasks:
+    - name: Create port on OpenStack
+      shell: >
+        source ~/keystonerc_admin && export OS_PROJECT_NAME=lab && \
+        openstack port create \
+          --fixed-ip subnet={{ hostvars[item]["network"] }}_subnet,ip-address={{ hostvars[item]["internal_ip"] }} \
+          --network {{ hostvars[item]["network"] }}_network \
+          {{ item }}-port
+      with_items: "{{ groups['dns'] }}"
+
+    - name: Attach port to floating ip
+      shell: >
+        source ~/keystonerc_admin && export OS_PROJECT_NAME=lab && \
+        openstack floating ip set \
+          --port {{ item }}-port \
+          {{ hostvars[item]["external_ip"] }}
+      with_items: "{{ groups['dns'] }}"
+      
+    - name: Create server on OpenStack
+      shell: >
+        source ~/keystonerc_admin && export OS_PROJECT_NAME=lab && \
+        openstack server create --flavor {{ hostvars[item]["flavor"] }} \
+          --key-name {{ hostvars[item]["key_name"] }} \
+          --image {{ hostvars[item]["image"] }} \
+          --port {{ item }}-port \
+          --wait \
+          {{ item }}
+      with_items: "{{ groups['dns'] }}"

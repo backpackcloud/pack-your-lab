@@ -1,0 +1,9 @@
+{% for host in groups['ocp'] %}
+{% if hostvars[host]["master"] %}
+address=/{{ ocp.console }}/{{ hostvars[host]['internal_ip'] }}
+{% endif %}
+{% if hostvars[host]["infra"] %}
+address=/.{{ ocp.subdomain }}/{{ hostvars[host]['internal_ip'] }}
+{% endif %}
+address=/{{ host }}/{{ hostvars[host]['internal_ip'] }}
+{% endfor %}

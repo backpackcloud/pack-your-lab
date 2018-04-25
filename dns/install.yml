@@ -1,0 +1,45 @@
+---
+- hosts: dns
+  name: Configure DNS
+
+  tasks:
+    - name: Ensure openstack hostname
+      shell: hostname {{ inventory_hostname }} && echo "{{ inventory_hostname }}" > /etc/hostname
+    
+    - name: Subscribe host
+      redhat_subscription:
+        state: present
+        username: "{{ subscription.user }}"
+        password: "{{ subscription.password }}"
+        pool_ids: "{{ subscription.pool_ids }}"
+
+    - name: Disable all repositories
+      shell: subscription-manager repos --disable=*
+      retries: 10
+      delay: 5
+
+    - name: Enable repos
+      shell: subscription-manager repos --enable={{ item }}
+      with_items: "{{ subscription.repos }}"
+      retries: 10
+      delay: 5
+
+    - name: Install packages
+      yum:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - dnsmasq
+      retries: 10
+      delay: 5
+
+    - name: Create config file
+      template:
+        src: ocp.j2
+        dest: /etc/dnsmasq.d/ocp
+
+    - name: Enable DNS service
+      systemd:
+        name: dnsmasq
+        state: started
+        enabled: yes
