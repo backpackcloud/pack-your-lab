@@ -20,4 +20,4 @@
           with_dict: "{{ osp.packstack }}"
 
     - name: packstack
-      shell: packstack --answer-file={{ osp.resource_path }}/packstack-answers.cfg --timeout=6000
+      shell: packstack --answer-file={{ osp.resource_path }}/packstack-answers.cfg --timeout=6000 > /tmp/packstack.log
