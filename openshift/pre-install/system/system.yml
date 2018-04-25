@@ -3,6 +3,9 @@
   name: Prepare System
 
   tasks:
+    - name: Ensure openstack hostname
+      shell: hostname {{ inventory_hostname }} && echo "{{ inventory_hostname }}" > /etc/hostname
+    
     - name: Subscribe host
       redhat_subscription:
         state: present
@@ -55,6 +58,3 @@
         state: latest
       retries: 10
       delay: 5
-
-    - name: Ensure openstack hostname
-      shell: hostname {{ inventory_hostname }} && echo "{{ inventory_hostname }}" > /etc/hostname
