@@ -1,0 +1,81 @@
+---
+- hosts: osp
+  name: Backup OpenStack Data
+
+  tasks:
+    - name: Stop servers
+      shell:
+        source ~/keystonerc_admin && export OS_PROJECT_NAME=lab && \
+        openstack server stop {{ item }}
+      with_items: "{{ groups['ocp'] }}"
+
+    - name: Create mount path
+      file:
+        path: "{{ osp.backup.mount_path }}"
+        state: directory
+
+    - name: Mount backup device
+      shell: mount {{ osp.backup.device }} {{ osp.backup.mount_path }}
+
+    - name: Create backup path
+      file:
+        path: "{{ osp.backup.mount_path }}/{{ osp.backup.path }}"
+        state: directory
+
+    - name: Remove attachments
+      shell: >
+        source ~/keystonerc_admin && export OS_PROJECT_NAME=lab && \
+        openstack server remove volume \
+          $(openstack volume show {{ item }} -c attachments --format shell | cut -d"'" -f4) \
+          {{ item }} || true
+      with_items: "{{ osp.backup.volumes }}"
+
+    - name: Remove previous images
+      shell: >
+        source ~/keystonerc_admin && export OS_PROJECT_NAME=lab && \
+        openstack image delete {{ item }} || true
+      with_items: "{{ osp.backup.volumes }}"      
+
+    - name: Upload volumes to images
+      shell: >
+        source ~/keystonerc_admin && export OS_PROJECT_NAME=lab && \
+        cinder upload-to-image {{ item }} {{ item }}
+      with_items: "{{ osp.backup.volumes }}"
+
+    - name: Wait until all images are saved
+      shell: >
+        source ~/keystonerc_admin && export OS_PROJECT_NAME=lab && \
+        eval $(openstack image show {{ item }} -c status --format shell --prefix image_) && echo $image_status
+      register: result
+      until: result.stdout == 'active'
+      retries: 100
+      delay: 10
+      with_items: "{{ osp.backup.volumes }}"
+
+    - name: Save images to external disk
+      shell: >
+        source ~/keystonerc_admin && export OS_PROJECT_NAME=lab && \
+        eval $(openstack image show {{ item }} -c id --format shell --prefix image_) && \
+        glance image-download $image_id --file="{{ osp.backup.mount_path }}/{{ osp.backup.path }}/{{ item }}"
+      with_items: "{{ osp.backup.volumes }}"
+
+    - name: Check md5
+      shell: >
+        source ~/keystonerc_admin && export OS_PROJECT_NAME=lab && \
+        eval $(openstack image show {{ item }} -c checksum --format shell --prefix image_) && \
+        echo "$image_checksum  {{ item }}" > "{{ osp.backup.mount_path }}/{{ osp.backup.path }}/{{ item }}.md5" && \
+        cd {{ osp.backup.mount_path }}/{{ osp.backup.path }} && md5sum -c "{{ item }}.md5"
+      with_items: "{{ osp.backup.volumes }}"
+
+    - name: Umount backup device
+      shell: umount {{ osp.backup.mount_path }}
+      register: result
+      until: result.rc == 0
+      retries: 100
+      delay: 10
+
+    - name: Start servers
+      shell:
+        source ~/keystonerc_admin && export OS_PROJECT_NAME=lab && \
+        openstack server start {{ item }}
+      with_items: "{{ groups['ocp'] }}"
