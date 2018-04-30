@@ -1,6 +1,5 @@
 ---
 - hosts: osp
-  remote_user: root
   name: Install OpenStack using Packstack
   tasks:
     - name: generate packstack config file

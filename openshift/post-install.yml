@@ -6,5 +6,5 @@
     - block:
       - name: Give cluster-admin access to defined user
         shell: >
-          oc adm policy add-cluster-role-to-user cluster-admin {{ ocp.cluster_admin_user }}      
+          oc adm policy add-cluster-role-to-user cluster-admin {{ ocp.cluster_admin_user }}
       when: (bastion is defined) and bastion
