@@ -131,7 +131,7 @@ is specified below:
 ```yaml
       images:
         name:
-          local_path: path/to/the/image
+          url: url/to/the/image
           disk_format: (ami, ari, aki, vhd, vmdk, raw, qcow2, vhdx, vdi, iso or ploop)
           min_disk: size in GB
           min_ram: size in MB
@@ -142,12 +142,12 @@ The `image_name` will be used as the name in the OpenStack. Below is an example:
 ```yaml
       images:
         rhel:
-          local_path: ~/workspace/pack-your-lab/images/rhel-server-7.4-x86_64-kvm.qcow2
+          url: https://server.example.com/images/rhel-server-7.4-x86_64-kvm.qcow2
           disk_format: qcow2
           min_disk: 10
           min_ram: 256
         rhel-atomic:
-          local_path: ~/workspace/pack-your-lab/images/rhel-atomic-cloud-7.4.3-8.x86_64.qcow2
+          url: https://server.example.com/images/rhel-atomic-cloud-7.4.3-8.x86_64.qcow2
           disk_format: qcow2
           min_disk: 10
           min_ram: 128

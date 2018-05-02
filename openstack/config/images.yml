@@ -3,13 +3,13 @@
   remote_user: root
   name: Configure OpenStack Images
   tasks:
-    - name: copy image file
-      copy:
-        src: "{{ item.value.local_path }}"
+    - name: download images
+      get_url:
+        url: "{{ item.value.url }}"
         dest: "{{ osp.resource_path }}/{{ item.key }}.image"
       with_dict: "{{ osp.images }}"
 
-    - name: create image
+    - name: create images
       shell: >
         source ~/keystonerc_admin && \
         openstack image create \
