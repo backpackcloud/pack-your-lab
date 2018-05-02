@@ -1,0 +1,19 @@
+---
+- hosts: osp
+  name: Restore OpenStack Volumes
+
+  tasks:
+    - name: Remove previous images
+      shell: >
+        source ~/keystonerc_admin && \
+        openstack image delete {{ item }} || true
+      with_items: "{{ osp.backup.volumes }}"      
+
+    - name: Save images
+      shell: >
+        source ~/keystonerc_admin && \
+        openstack image create \
+          --public \
+          --file {{ osp.backup.path }}/{{ item }} \
+          {{ item }}
+      with_items: "{{ osp.backup.volumes }}"
