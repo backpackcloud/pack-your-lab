@@ -8,10 +8,14 @@ ansible_ssh_user=cloud-user
 ansible_become=yes
 
 openshift_deployment_type=openshift-enterprise
-openshift_release=v3.9
+openshift_release=v3.10
 os_sdn_network_plugin_name=redhat/openshift-ovs-networkpolicy
 
 openshift_install_examples=true
+
+openshift_use_crio=true
+openshift_crio_use_rpm=true
+openshift_crio_enable_docker_gc=true
 
 openshift_master_identity_providers=[{'name': 'allow_all', 'login': 'true', 'challenge': 'true', 'kind': 'AllowAllPasswordIdentityProvider'}]
 
@@ -36,7 +40,7 @@ openshift_logging_es_memory_limit=2Gi
 
 {% set master_port = '443' %}
 {% for host in groups['ocp'] %}
-{% if hostvars[host]["master"] and hostvars[host]["infra"] %}
+{% if hostvars[host]["kind"] == 'master-infra' %}
 {% set master_port = '8443' %}
 {% endif %}
 {% endfor %}
@@ -74,19 +78,19 @@ openshift_hosted_etcd_storage_labels={'storage': 'etcd'}
 
 [masters]
 {% for host in groups['ocp'] %}
-{% if hostvars[host]["master"] %}
+{% if hostvars[host]["kind"] == "master" %}
 {{ host }} openshift_hostname={{ host }}
 {% endif %}
 {% endfor %}
 
 [etcd]
 {% for host in groups['ocp'] %}
-{% if hostvars[host]["etcd"] %}
+{% if hostvars[host]["kind"] == "master" %}
 {{ host }} openshift_hostname={{ host }}
 {% endif %}
 {% endfor %}
 
 [nodes]
 {% for host in groups['ocp'] %}
-{{ host }} openshift_hostname={{ host }} {% if hostvars[host]["bastion"] %}ansible_connection=local{% endif %} openshift_node_labels="{ {% if hostvars[host]["infra"] %}'region': 'infra',{% endif %} 'zone': 'default'}"
+{{ host }} openshift_hostname={{ host }} {% if hostvars[host]["bastion"] %}ansible_connection=local{% endif %} openshift_node_group_name='node-config-{{ hostvars[host]["kind"] }}'
 {% endfor %}

@@ -12,7 +12,7 @@
 
       - name: Run Install Playbook
         shell: >
-          ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml > /tmp/ansible.log
+          ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml >> /tmp/ansible.log
 
       when: (bastion is defined) and bastion
 

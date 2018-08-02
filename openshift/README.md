@@ -78,10 +78,7 @@ This is the main structure of the section
 In order to create the instances and configure them, a set of host vars is needed:
 
 - `bastion`: sets the hosts as the bastion host (the host that will run the OCP installer playbook)
-- `infra`: sets the host as an OCP infra node
-- `master`: sets the host as an OCP master node
-- `etcd`: mark the host to have etcd installed
-- `schedulable`: sets the host to receive pods from scheduler
+- `kind`: sets the kind of the node (master, compute, infra or master-infra)
 - `internal_ip`: sets the internal ip (OpenStack network)
 - `external_ip`: sets the external ip (physical network)
 - `docker_storage`: sets the parameters for creating and attaching the docker storage volume
