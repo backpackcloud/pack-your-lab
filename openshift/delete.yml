@@ -1,0 +1,19 @@
+---
+- hosts: ocp
+  name: Release system
+
+  tasks:
+    - name: Unsubscribe system
+      shell: subscription-manager remove --all
+
+- hosts: osp
+  name: Delete OpenShift Cluster
+
+  tasks:
+    - name: Delete servers
+      shell: openstack server delete {{ item }} --wait
+      with_items: "{{ groups['ocp'] }}"
+
+    - name: Delete ports
+      shell: openstack port delete {{ item }}-port --wait
+      with_items: "{{ groups['ocp'] }}"
