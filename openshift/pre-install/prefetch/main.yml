@@ -1,0 +1,144 @@
+---
+- hosts: ocp
+  name: Prefetch resources
+
+  tasks:
+    - name: Pull base images
+      shell: until docker pull {{ item }} >> /tmp/prefetch.log ; do sleep 0.1; done
+      with_items:
+        - registry.access.redhat.com/openshift3/ose-node:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/ose-node-problem-detector:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/ose-ansible:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/ose-cli:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/ose-pod:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/ose-recycler:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/ose-control-plane:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/ose-deployer:{{ ocp.tag }}
+      when: prefetch is search("base")
+
+    - name: Pull base images
+      shell: until docker pull {{ item }} >> /tmp/prefetch.log ; do sleep 0.1; done
+      with_items:
+        - registry.access.redhat.com/openshift3/ose-web-console:{{ ocp.tag }}
+      when: prefetch is search("master")
+
+    - name: Pull infrastructure components images
+      shell: until docker pull {{ item }} >> /tmp/prefetch.log ; do sleep 0.1; done
+      with_items:
+        - registry.access.redhat.com/openshift3/image-inspector:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/local-storage-provisioner:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/ose-cluster-capacity:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/ose-descheduler:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/ose-docker-builder:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/ose-docker-registry:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/ose-egress-dns-proxy:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/ose-egress-http-proxy:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/ose-egress-router:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/ose-haproxy-router:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/ose-hyperkube:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/ose-hypershift:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/ose-keepalived-ipfailover:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/registry-console:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/snapshot-controller:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/snapshot-provisioner:{{ ocp.tag }}
+        - registry.access.redhat.com/rhel7/etcd
+      when: prefetch is search("infra")
+
+    - name: Pull logging images
+      shell: until docker pull {{ item }} >> /tmp/prefetch.log ; do sleep 0.1; done
+      with_items:
+        - registry.access.redhat.com/openshift3/logging-auth-proxy:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/logging-curator:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/logging-elasticsearch:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/logging-eventrouter:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/logging-fluentd:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/logging-kibana:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/oauth-proxy:{{ ocp.tag }}
+      when: prefetch is search("logging")
+
+    - name: Pull metrics images
+      shell: until docker pull {{ item }} >> /tmp/prefetch.log ; do sleep 0.1; done
+      with_items:
+        - registry.access.redhat.com/openshift3/oauth-proxy:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/metrics-cassandra:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/metrics-hawkular-metrics:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/metrics-hawkular-openshift-agent:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/metrics-heapster:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/metrics-schema-installer:{{ ocp.tag }}
+      when: prefetch is search("metrics")
+
+    - name: Pull prometheus images
+      shell: until docker pull {{ item }} >> /tmp/prefetch.log ; do sleep 0.1; done
+      with_items:
+        - registry.access.redhat.com/openshift3/prometheus:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/prometheus-alert-buffer:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/prometheus-alertmanager:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/prometheus-node-exporter:{{ ocp.tag }}
+        - registry.access.redhat.com/rhgs3/rhgs-server-rhel7
+        - registry.access.redhat.com/rhgs3/rhgs-volmanager-rhel7
+        - registry.access.redhat.com/rhgs3/rhgs-gluster-block-prov-rhel7
+        - registry.access.redhat.com/rhgs3/rhgs-s3-server-rhel7
+      when: prefetch is search("prometheus")
+
+    - name: Pull gluster images
+      shell: until docker pull {{ item }} >> /tmp/prefetch.log ; do sleep 0.1; done
+      with_items:
+        - registry.access.redhat.com/rhgs3/rhgs-server-rhel7
+        - registry.access.redhat.com/rhgs3/rhgs-volmanager-rhel7
+        - registry.access.redhat.com/rhgs3/rhgs-gluster-block-prov-rhel7
+        - registry.access.redhat.com/rhgs3/rhgs-s3-server-rhel7
+      when: prefetch is search("gluster")
+
+    - name: Pull service catalog and broker images
+      shell: until docker pull {{ item }} >> /tmp/prefetch.log ; do sleep 0.1; done
+      with_items:
+        - registry.access.redhat.com/openshift3/apb-base:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/apb-tools:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/ose-service-catalog:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/ose-ansible-service-broker:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/mariadb-apb:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/mediawiki-apb:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/mysql-apb:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/ose-template-service-broker:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/postgresql-apb:{{ ocp.tag }}
+      when: prefetch is search("services")
+
+    - name: Pull S2I images
+      shell: until docker pull {{ item }} >> /tmp/prefetch.log ; do sleep 0.1; done
+      with_items:
+        - registry.access.redhat.com/jboss-amq-6/amq63-openshift
+        - registry.access.redhat.com/jboss-datagrid-7/datagrid71-openshift
+        - registry.access.redhat.com/jboss-datagrid-7/datagrid71-client-openshift
+        - registry.access.redhat.com/jboss-datagrid-7/datagrid72-openshift
+        - registry.access.redhat.com/jboss-datavirt-6/datavirt64-openshift
+        - registry.access.redhat.com/jboss-datavirt-6/datavirt64-driver-openshift
+        - registry.access.redhat.com/jboss-decisionserver-6/decisionserver64-openshift
+        - registry.access.redhat.com/jboss-processserver-6/processserver64-openshift
+        - registry.access.redhat.com/jboss-eap-6/eap64-openshift
+        - registry.access.redhat.com/jboss-eap-7/eap71-openshift
+        - registry.access.redhat.com/jboss-webserver-3/webserver31-tomcat7-openshift
+        - registry.access.redhat.com/jboss-webserver-3/webserver31-tomcat8-openshift
+        - registry.access.redhat.com/openshift3/jenkins-1-rhel7
+        - registry.access.redhat.com/openshift3/jenkins-2-rhel7
+        - registry.access.redhat.com/openshift3/jenkins-agent-maven-35-rhel7:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/jenkins-agent-nodejs-8-rhel7:{{ ocp.tag }}
+        - registry.access.redhat.com/openshift3/jenkins-slave-base-rhel7
+        - registry.access.redhat.com/openshift3/jenkins-slave-maven-rhel7
+        - registry.access.redhat.com/openshift3/jenkins-slave-nodejs-rhel7
+        - registry.access.redhat.com/rhscl/s2i-core-rhel7
+        - registry.access.redhat.com/rhscl/mongodb-32-rhel7
+        - registry.access.redhat.com/rhscl/mysql-57-rhel7
+        - registry.access.redhat.com/rhscl/perl-524-rhel7
+        - registry.access.redhat.com/rhscl/php-56-rhel7
+        - registry.access.redhat.com/rhscl/postgresql-95-rhel7
+        - registry.access.redhat.com/rhscl/python-35-rhel7
+        - registry.access.redhat.com/rhscl/ruby-24-rhel7
+        - registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift
+        - registry.access.redhat.com/rhscl/nodejs-6-rhel7
+        - registry.access.redhat.com/rhscl/mariadb-101-rhel7
+      when: prefetch is search("s2i")
+
+    - name: Pull extra images
+      shell: until docker pull {{ item }} >> /tmp/prefetch.log ; do sleep 0.1; done
+      with_items: "{{ ocp.extra_images }}"
+      when: prefetch is search("extra")
