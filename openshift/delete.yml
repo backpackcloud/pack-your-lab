@@ -11,9 +11,19 @@
 
   tasks:
     - name: Delete servers
-      shell: openstack server delete {{ item }} --wait
+      shell: >
+            source ~/keystonerc_admin && export OS_PROJECT_NAME=lab && \
+            openstack server delete {{ item }} --wait
       with_items: "{{ groups['ocp'] }}"
 
     - name: Delete ports
-      shell: openstack port delete {{ item }}-port --wait
+      shell: >
+            source ~/keystonerc_admin && export OS_PROJECT_NAME=lab && \
+            openstack port delete {{ item }}-port
+      with_items: "{{ groups['ocp'] }}"
+
+    - name: Delete docker storage volumes
+      shell: >
+            source ~/keystonerc_admin && export OS_PROJECT_NAME=lab && \
+            openstack volume delete {{ hostvars[item]["docker_storage"]["volume"] }}
       with_items: "{{ groups['ocp'] }}"
