@@ -5,4 +5,3 @@
 - import_playbook: pre-install/docker-storage/docker-storage.yml
 - import_playbook: pre-install/ansible/config.yml
 - import_playbook: pre-install/ansible/inventory.yml
-- import_playbook: pre-install/prefetch/main.yml
