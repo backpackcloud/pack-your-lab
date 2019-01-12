@@ -37,6 +37,7 @@ openshift_cloudprovider_openstack_blockstorage_version=v2
 
 {% if ocp.deploy_metrics %}
 openshift_metrics_install_metrics=true
+openshift_metrics_server_install=true
 openshift_metrics_cassandra_storage_type=dynamic
 {% endif %}
 
@@ -84,7 +85,7 @@ openshift_template_service_broker_namespaces=['openshift']
 openshift_hosted_registry_storage_kind=openstack
 openshift_hosted_registry_storage_access_modes=['ReadWriteOnce']
 openshift_hosted_registry_storage_openstack_filesystem=ext4
-openshift_hosted_registry_storage_openstack_volumeID={{ ocp.registry.volume.id }}
+#openshift_hosted_registry_storage_openstack_volumeID={{ ocp.registry.volume.id }}
 openshift_hosted_registry_storage_volume_size={{ ocp.registry.volume.size }}
 
 openshift_hosted_etcd_storage_kind=dynamic
