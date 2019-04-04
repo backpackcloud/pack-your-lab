@@ -94,14 +94,14 @@ openshift_hosted_etcd_storage_labels={'storage': 'etcd'}
 [masters]
 {% for host in groups['ocp'] %}
 {% if hostvars[host]["kind"] == "master" %}
-{{ host }} openshift_hostname={{ host }}
+{{ host }}
 {% endif %}
 {% endfor %}
 
 [etcd]
 {% for host in groups['ocp'] %}
 {% if hostvars[host]["kind"] == "master" %}
-{{ host }} openshift_hostname={{ host }}
+{{ host }}
 {% endif %}
 {% endfor %}
 
