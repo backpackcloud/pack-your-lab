@@ -65,8 +65,6 @@ openshift_cluster_monitoring_operator_install=false
 openshift_master_api_port={{ master_port }}
 openshift_master_console_port={{ master_port }}
 
-openshift_override_hostname_check=true
-
 openshift_disable_check=disk_availability,memory_availability,docker_image_availability
 
 osm_api_server_args={'deserialization-cache-size': ['1000']}
@@ -109,5 +107,5 @@ openshift_hosted_etcd_storage_labels={'storage': 'etcd'}
 
 [nodes]
 {% for host in groups['ocp'] %}
-{{ host }} openshift_hostname={{ host }} openshift_node_group_name='node-config-{{ hostvars[host]["kind"] }}'
+{{ host }} openshift_node_group_name='node-config-{{ hostvars[host]["kind"] }}'
 {% endfor %}
